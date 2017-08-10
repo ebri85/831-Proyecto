@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -14,28 +14,28 @@ using namespace std;
 
 
 struct Jugador{
-    int codJugador;
-    string nombre;
-
+    char *cedula;
+    char *nombre;
+    int   totalPuntos;
 };
 
-struct Perdedor{
-    int ronda;
-    int codJugador;
-    string nombre;
-    int puntos;
-
-};
+//struct Perdedor{
+//    int ronda;
+//    int codJugador;
+//    string nombre;
+//    int puntos;
+//
+//};
 
 struct Ronda{
-    int codJugador;
+    char *codJugador;
       int puntos;
 };
 
 struct Tragos{
 
     int cod;
-    string nombre;
+    char *nombre;
     int costo;
 
 };
@@ -65,7 +65,7 @@ int fila= 0;
 //Funciones Prototipo
 
 //Jugador [][] IniciaJuego();
-void RegistraJugador(Jugador [], int);
+void RegistraJugador(Jugador &j);
 void RegistraPartida(Ronda [][tamRonda],int,int,Jugador []);
 void IdentificaPerdedor(Ronda [][tamRonda], Perdedor [],Jugador [], int,int);
 void ImprimePerdedores(Perdedor [],Jugador [], Tragos []);
@@ -193,21 +193,19 @@ return resultado;
 
 ///Registra el jugador, con el nombre, asigna codigo, y estado, se guarda
 ///se guarda en arreglo de structs Jugadores
-void RegistraJugador(Jugador arreglo[],int tam){
+void RegistraJugador(Jugador &j, fstream &archivo){
     try{
-        Jugador *ptrArreglo;
-            ptrArreglo = &arreglo[0];
-            int cod = 1;
+            ofstream archivo("RegistroJugadores",ios::out);
 
-            for(int i=0;i<tam;i++){
+            if(!archivo)
+            {
+                cerr<<"No se pudo generar el archivo."<<endl;
+                exit(1);
+            }
 
-                ptrArreglo->codJugador = cod++;
-
-                cout<<"Digite el nombre del Jugador"<<endl;
-                    cin>>ptrArreglo->nombre;
+            archivo<<"Cedula\t\t"<<"Nombre\t\t"<<"Puntaje"<<endl;
 
 
-                ptrArreglo++;
 
                 }
 
@@ -313,7 +311,7 @@ void ImprimePerdedores(Perdedor perd[],Jugador jug[], Tragos tbl[]){
 }
 
 
-int *Puntaje(){
+int Puntaje(){
     int resultado=0;
     int num;
     const int PTOSDARDOS[6] = {1,2,3,4,5,10};
