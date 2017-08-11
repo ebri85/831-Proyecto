@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1502487782 source:c:\users\esau.brizuela\documents\gits\831-proyecto\main.cpp
+	<iostream>
+	<fstream>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<vector>
+	<time.h>
+
