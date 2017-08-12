@@ -18,3 +18,13 @@
 	<string>
 	<time.h>
 
+1502535585 source:/mnt/2f2dfa39-718c-473d-812f-c6849c15048a/GITRepos/831-Proyecto/main.cpp
+	<iostream>
+	<fstream>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<vector>
+	<string>
+	<time.h>
+

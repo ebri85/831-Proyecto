@@ -60,10 +60,17 @@ struct Tragos
 //Variables Globales
 
 const int tamRonda = 10;
-int fila= 0;
+bool estatus;
 fstream archivo;
 ofstream escribe;
 ifstream lee;
+string hilera ="";
+vector <string> jugadores;
+vector <string> temporal;
+int cont =0;
+
+
+
 
 
 
@@ -78,15 +85,15 @@ ifstream lee;
 
 //Funciones Prototipo
 
-//Jugador [][] IniciaJuego();
 void RegistraJugador(string &ced, string &nomb);
-
 int generaArchivo();
 void RegistraPartida(Ronda [][tamRonda],int,int,Jugador []);
-//void IdentificaPerdedor(Ronda [][tamRonda], Perdedor [],Jugador [], int,int);
-//void ImprimePerdedores(Perdedor [],Jugador [], Tragos []);
+
 int Puntaje();
 int menu();
+void imprimeLineas(int &,string &,string &,int &);
+void imprimeLineas(int &,string &,string &);
+void leeArchivo(ifstream &,bool &);
 
 
 int main()
@@ -96,11 +103,10 @@ int main()
         int op =0;
         char opc;
 
-      //  Jugador jugadores[fila];
-     //   Ronda ronda[fila][tamRonda];
 
- generaArchivo();
-//        Perdedor perdedor[tamRonda];
+
+        generaArchivo();
+
 
 
             do{
@@ -124,7 +130,7 @@ int main()
                                             cin>>nombre;
 
                                         RegistraJugador(cedula,nombre);
-                                            cout<<"Desea agregar otro usuario?"<<endl;
+                                            cout<<"Desea agregar otro usuario : S/N?"<<endl;
                                                 cin>>continua;
 
                                     }while(toupper(continua)=='S');
@@ -135,15 +141,79 @@ int main()
 
 
                         case 2:
+                            {
+                                estatus = true;
+                                bool existe = true;
+                                bool sigue= true;
+                                char c;
+
+                                string ced;
+                                cout<<"Lista de Jugadores Registrados"<<endl;
+                                leeArchivo(lee,estatus);
+
+
+                                while((existe)&&(sigue))
+                                    //valida el numero de cedula que exista en el vector temporal
+                                    //luego lo agrega a un vector de jugadores, esto va a facilitar la busqueda en el archivo
+                                    //y poder generar los puntos de la ronda de cada uno
+                                    {
+                                        cout<<"Digite el numero de Cedula del Jugador"<<endl;
+                                        cin>>ced;
+                                        for(unsigned int i =0;i<temporal.size();i++)
+                                        {
+                                            if(ced==temporal[i])
+                                            {
+                                                existe = true;
+                                               //  cout<<"Revise la cedula que digito, porque no es un usuario registrado"<<endl;
+
+                                            }
+
+                                        }
+
+                                        jugadores.push_back(ced);
+
+                                        if(jugadores.size()>2)
+                                        {   sigue = true;
+                                            if(jugadores.size()<9)
+                                            {
+                                                cout<<"Desea agregar otro Jugador?: S/N"<<endl;
+                                                cin>>c;
+                                                 sigue = (toupper(c)=='N')?false:true;
+
+                                            }
+
+                                        }
+
+                                    }
+
+                            }
 
 
                         break;
 
                         case 3:
 
+                            {
+                                estatus = false;
+                                cout<<"****RANKING****"<<endl;
+                                leeArchivo(lee,estatus);
+                                cout<<"\n"<<endl;
+
+
+                            }
 
 
 
+                        break;
+                        case 4:
+                            {
+                                string mensaje;
+
+                                mensaje = (remove("Tabla_Resultados.txt")?  "ERROR\n\n" :"Archivo Borrado Satisfactoriamente\n\n");
+
+                                cout<< mensaje<<endl;
+
+                            }
 
                         break;
 
@@ -182,10 +252,11 @@ int menu()
 
     string menu = "Juego BAR LA Sanguijuela Testaruda\n\n";
 
-    menu+= "1 - Registro de Participantes \n";
-    menu+= "2 - Realizar las Rondas \n";
-    menu+= "3 - Muestra Resultados \n";
-    menu+= "0 - SALIR \n\n";
+    menu+=  "1 - Registro de Participantes \n";
+    menu+=  "2 - Realizar las Rondas \n";
+    menu+=  "3 - Ver Ranking\n";
+    menu+=  "4 - Borrar Archivo\n";
+    menu+=  "0 - SALIR \n\n";
 
 
     cout<<menu<<endl;
@@ -197,10 +268,11 @@ return resultado;
 int generaArchivo()
 ///revisa si el archivo existe abriendolo, si existe lo cierra, si no existe crea el mismo y lo cierra
 {
-    ofstream wr;
-       if (wr.good())//revisa si esta creado el archivo, retorna 1 si el archivo existe
+
+
+       if (lee.is_open())//revisa si esta creado el archivo, retorna 1 si el archivo existe
        {
-           wr.close();
+           lee.close();
            return 1;
        }
         else
@@ -208,12 +280,81 @@ int generaArchivo()
                 //crea el archivo retorna 0
 
                   archivo.open("Tabla_Resultados.txt");
-                  wr.close();
+                  archivo.close();
                 return 0;
 
             }
 }
 
+void leeArchivo(ifstream &rd,bool &t)
+//va a leer el archivo e imprimir el contenido del archivo,
+//dependiendo el valor de true o false que se le pase imprime los puntos, la idea es que si entra en true es
+//para imprimir la lista de jugadores para poder seleccionarlos para
+//la partida
+{
+    string hilera;
+
+    Jugador *j = new Jugador();
+
+    rd.open("Tabla_Resultados.txt");
+    if(!rd)
+    {
+        cerr<<"Error para abrir el Archivo";
+
+        exit (1);
+    }
+
+    if(t)
+    {
+         hilera = "INDICE\t\tCEDULA\t\t\t\tNOMBRE\n";
+
+
+         cout<<hilera<<endl;
+
+
+         while(rd>>j->cedula>>j->nombre>>j->totalPuntos)
+         {
+
+
+             temporal.push_back(j->cedula);
+             cont++;
+
+               imprimeLineas(cont,j->cedula,j->nombre);
+         }
+
+    }else
+        {
+
+            hilera = "INDICE\t\t\t\tCEDULA\t\t\\t\ttNOMBRE\t\t\t\t\t\tPUNTAJE\n";
+
+            cout<<hilera<<endl;
+
+             while(rd>>j->cedula>>j->nombre>>j->totalPuntos)
+             {
+                 imprimeLineas(cont,j->cedula,j->nombre,j->totalPuntos);
+             }
+
+        }
+
+
+        delete j;
+        rd.close();
+
+
+}
+
+void imprimeLineas(int &indice,string &cedula,string &nombre, int &ptos)
+    //imprime lineas dle archivo
+    {
+
+        cout<<indice<<"\t\t"<<cedula<<"\t\t\t"<<nombre<<"\t\t\t"<<ptos<<endl;
+    }
+
+void imprimeLineas(int &indice,string &cedula,string &nombre)
+    //imprime lineas dle archivo
+    {
+        cout<<indice<<"\t\t"<<cedula<<"\t\t\t"<<nombre<<"\t\t\t"<<endl;
+    }
 
 
 void RegistraJugador(string &ced, string &nomb)
@@ -244,100 +385,6 @@ void RegistraJugador(string &ced, string &nomb)
     }
 
 }
-
-
-///Metodo registra partida, se guarda en un arreglo de partidas, con los puntos obtenidos
-//void RegistraPartida(Ronda arreglo[][tamRonda],int numFila,int rondaNumero,Jugador jug[]){
-//   try{
-//
-//        int sum;
-//        Ronda *ptrRonda;
-//
-//
-//        ptrRonda = &arreglo[numFila][rondaNumero];
-//
-//        ptrRonda->codJugador = jug[numFila].codJugador ;
-//             srand(time(0));
-//            sum= Puntaje() ;
-//
-//            ptrRonda->puntos = sum + Puntaje();
-//
-//
-//
-//    }   catch(...){
-//
-//        cout<<"Ocurrio un problema"<< endl;
-//    }
-//}
-/////Recorre la partida y guarda el perdedor en un arreglo, registra el trago que compro
-//void IdentificaPerdedor(Ronda arreglo[][tamRonda], Perdedor perd[],Jugador jug[],int f,int c){
-//
-//    Perdedor *ptrPerdedor;
-//
-//    ptrPerdedor = &perd[0];
-//    int ronda =1;
-//
-//    for (int i = 0; i<f;i++){
-//        for(int j = 0;j<c;j++){
-//         srand(time(0));
-//
-//            if(arreglo[i][j].puntos<arreglo[i+1][j+1].puntos){
-//
-//                ptrPerdedor->ronda = ronda++;
-//
-//                ptrPerdedor->codJugador = jug[i].codJugador;
-//
-//                ptrPerdedor->nombre = jug[i].nombre;
-//
-//                ptrPerdedor->puntos = Puntaje();
-//
-//            } else{
-//
-//                    ptrPerdedor->ronda = ronda++;
-//
-//                    ptrPerdedor->codJugador = jug[i+1].codJugador;
-//
-//                    ptrPerdedor->nombre = jug[i+1].nombre;
-//
-//                    ptrPerdedor->puntos = Puntaje();
-//
-//
-//
-//            }
-//            ptrPerdedor++;
-//
-//
-//        }
-//
-//    }
-//
-//
-//
-//}
-//
-/////Imprime la lista de Perdedores por del Arreglo de Perderdores por en cada Ronda
-//
-//void ImprimePerdedores(Perdedor perd[],Jugador jug[], Tragos tbl[]){
-//
-//    Perdedor *ptrPerdedor;
-//    int cont = 0;
-//    int pos;
-//    ptrPerdedor = &perd[0];
-//
-//    for(int i = 0;i<tamRonda;i++) {
-//
-//           pos = ptrPerdedor->puntos;
-//
-//            cout<<"Nombre del perdedor de la Ronda"<<" "<<cont+1<<" "<< jug[cont].nombre<<" "<<"Compro Trago"<< tbl[pos].nombre<<endl;
-//
-//
-//
-//
-//        ptrPerdedor++;
-//        cont++;
-//    }
-//}
-
 
 int Puntaje(){
     int resultado=0;
