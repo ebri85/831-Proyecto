@@ -175,14 +175,15 @@ int main()
 
 
 int menu()
-{ //Metodo encargado de Mostrar el de Menu en Consola
+//Metodo encargado de Mostrar el de Menu en Consola
+{
 
     int resultado=0;
 
     string menu = "Juego BAR LA Sanguijuela Testaruda\n\n";
 
     menu+= "1 - Registro de Participantes \n";
-    menu+= "2 - Inicio Partidas \n";
+    menu+= "2 - Realizar las Rondas \n";
     menu+= "3 - Muestra Resultados \n";
     menu+= "0 - SALIR \n\n";
 
@@ -194,8 +195,8 @@ return resultado;
 }
 
 int generaArchivo()
+///revisa si el archivo existe abriendolo, si existe lo cierra, si no existe crea el mismo y lo cierra
 {
-
     ofstream wr;
        if (wr.good())//revisa si esta creado el archivo, retorna 1 si el archivo existe
        {
@@ -211,12 +212,12 @@ int generaArchivo()
                 return 0;
 
             }
-
 }
 
-///Registra el jugador, con el nombre, asigna codigo, y estado, se guarda
-///se guarda en arreglo de structs Jugadores
+
+
 void RegistraJugador(string &ced, string &nomb)
+///Registra el jugador, con el nombre, asigna cedula, y puntaje en 0, se guarda en un archivo de texto
 {
     try{
 
