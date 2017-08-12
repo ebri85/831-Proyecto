@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <vector>
+#include <string>
 
 #include <time.h>
 
@@ -20,6 +21,16 @@ struct Jugador
     string cedula;
     string nombre;
     int totalPuntos;
+
+    Jugador(){};
+
+    Jugador(string cedula, string nombre, int totalPuntos)
+    {
+        this->cedula=cedula;
+        this->nombre= nombre;
+        this->totalPuntos = totalPuntos;
+    }
+
 
 };
 
@@ -68,8 +79,9 @@ ifstream lee;
 //Funciones Prototipo
 
 //Jugador [][] IniciaJuego();
-void RegistraJugador();
-bool generaArchivo();
+void RegistraJugador(string &ced, string &nomb);
+
+int generaArchivo();
 void RegistraPartida(Ronda [][tamRonda],int,int,Jugador []);
 //void IdentificaPerdedor(Ronda [][tamRonda], Perdedor [],Jugador [], int,int);
 //void ImprimePerdedores(Perdedor [],Jugador [], Tragos []);
@@ -83,10 +95,11 @@ int main()
     try{
         int op =0;
         char opc;
-        int fila;
+
       //  Jugador jugadores[fila];
      //   Ronda ronda[fila][tamRonda];
-        generaArchivo;
+
+ generaArchivo();
 //        Perdedor perdedor[tamRonda];
 
 
@@ -97,9 +110,26 @@ int main()
                 switch(op){
 
                         case 1:
+                            {
+                                char continua;
 
-                                RegistraJugador();
 
+                                    do
+                                    {
+                                        string cedula= "";
+                                        cout<<"Digite el Numero de Cedula del Usuario"<<endl;
+                                            cin>>cedula;
+                                        string nombre="";
+                                        cout<<"Digite el Nombre del Jugador"<<endl;
+                                            cin>>nombre;
+
+                                        RegistraJugador(cedula,nombre);
+                                            cout<<"Desea agregar otro usuario?"<<endl;
+                                                cin>>continua;
+
+                                    }while(toupper(continua)=='S');
+
+                            }
 
                         break;
 
@@ -163,42 +193,45 @@ return resultado;
 //Fin de Metodo Menu
 }
 
-bool generaArchivo()
+int generaArchivo()
 {
-   ofstream wr("Tabla_Resultados.txt",ios::out);
 
-    return (!wr)?true: false;
+    ofstream wr;
+       if (wr.good())//revisa si esta creado el archivo, retorna 1 si el archivo existe
+       {
+           wr.close();
+           return 1;
+       }
+        else
+            {
+                //crea el archivo retorna 0
+
+                  archivo.open("Tabla_Resultados.txt");
+                  wr.close();
+                return 0;
+
+            }
 
 }
 
 ///Registra el jugador, con el nombre, asigna codigo, y estado, se guarda
 ///se guarda en arreglo de structs Jugadores
-void RegistraJugador()
+void RegistraJugador(string &ced, string &nomb)
 {
     try{
-        char continua;
-        Jugador j;
 
-        ofstream escribe("Tabla_Resultados.txt");
+        ofstream escribe("Tabla_Resultados.txt",ios::app);
+        int ptos=0;
 
             if(escribe.is_open())
             {
-                do
-                    {
-                        cout<<"Digite el Numero de Cedula del Usuario"<<endl;
-                            cin>>j.cedula;
-                        cout<<"Digite el Nombre del Jugador"<<endl;
-                            cin>>j.nombre;
-                            j.totalPuntos=0;
-                        escribe<<j.cedula<<"\t"<<j.nombre<<j.totalPuntos<<endl;
+               Jugador *j = new Jugador(ced,nomb,ptos);
 
+                escribe<< j->cedula <<"\t\t\t"<< j->nombre <<"\t\t\t"<< j->totalPuntos <<endl;
 
-                        cout<<"Desea agregar otro Jugador?"<<endl;
-                            cin>>continua;
-                    }
-                while(toupper(continua)=='S');
+                delete j;
+
              escribe.close();
-
             }
             else
             {
@@ -208,7 +241,6 @@ void RegistraJugador()
 
         cout<<"Ocurrio un problema"<< endl;
     }
-
 
 }
 
