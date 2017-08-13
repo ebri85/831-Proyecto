@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include <vector>
 #include <string>
+#include <strings.h>
+
 
 #include <time.h>
 
@@ -90,8 +92,7 @@ void imprimeLineas(int &,string &,string &);
 void OrdenaVector(vector<Jugador> &);
 void leeArchivo(ifstream &,bool &);
 void modificArchivo(vector<Jugador>&);
-bool ComparaString(string );
-
+bool ComparaString(string c,vector<Jugador> &lt);
 int CopiaArchivo_Vector(vector <Jugador>&);
 
 int main()
@@ -101,7 +102,7 @@ int main()
         int op =0;
         char opc;
         Jugador jug;
-
+        vector <Jugador> listaTemporal;
 
 
         generaArchivo();
@@ -123,6 +124,8 @@ int main()
                                         cout<<"Digite el Nombre del Jugador"<<endl;
                                             cin>>nombre;
 
+
+
                                         RegistraJugador(cedula,nombre);
                                             cout<<"Desea agregar otro usuario : S/N?"<<endl;
                                                 cin>>continua;
@@ -137,7 +140,8 @@ int main()
                             {
                                 estatus = true;
                                 bool existe = true;
-                                bool sigue= true;
+                                bool sigue =true;
+
 
 
                                 string ced;
@@ -147,36 +151,30 @@ int main()
                                 CopiaArchivo_Vector(listaTemporal);
                                 char c;
 
-                                while((existe)&&(sigue))
+                                while((existe==1)&&(sigue==1))
                                     //valida el numero de cedula que exista en el vector temporal
                                     //luego lo agrega a un vector de jugadores, esto va a facilitar la busqueda en el archivo
                                     //y poder generar los puntos de la ronda de cada uno
                                     {
                                         cout<<"Digite el numero de Cedula del Jugador"<<endl;
                                         cin>>ced;
-//                                            for(unsigned int i =0;i<listaTemporal.size();i++)
-//                                            {
-//                                                if(listaTemporal[i].cedula.compare(ced)==1)
-//                                                {
-//                                                    existe = true;
-//                                                }
-//                                            }
-                                            existe = ComparaString(ced);
 
-                                        //  cout<<"Revise la cedula que digito, porque no es un usuario registrado"<<endl;
-                                        jugadores.push_back(ced);
+                                            existe = ComparaString(ced,listaTemporal);
+                                        if(existe==1){
+                                              jugadores.push_back(ced);
+
+                                        }
 
                                         if(jugadores.size()>1)
                                         {   sigue = true;
-                                            if(jugadores.size()<9)
-                                            {
+
                                                 cout<<"Desea agregar otro Jugador?: S/N"<<endl;
                                                 cin>>c;
-                                                 sigue = (toupper(c)=='N')?false:true;
+                                                 sigue = (toupper(c)!='N')?true:false;
 
-                                            }
                                         }
                                     }
+                                    archivo.close();
                             }
 
                         break;
@@ -205,12 +203,13 @@ int main()
                         break;
 
                         case 0:
+                            {
 
-
+                            }
 
                             return 0;
 
-
+                        break;
                         default:
                             break;
 
@@ -229,17 +228,20 @@ int main()
 
     }
 
-bool ComparaString(string c)
+bool ComparaString(string c,vector<Jugador> &lt)
 {
-    bool resultado = false;
-    int j;
-    for(unsigned int i=0; i< listaTemporal.size();i++)
+    bool resultado ;
+
+
+   for(unsigned int i=0; i< lt.size();i++)
     {
-        j = listaTemporal[i].cedula.compare(c);
+
+          resultado = ((c.compare(lt[i].cedula))!=0)? true : false;
+
 
         }
 
-        resultado = (j==0)?true:false;
+
 
     return resultado;
 
@@ -288,6 +290,7 @@ int CopiaArchivo_Vector(vector <Jugador> &lt)
             resultado++;
 
         }
+        lee.close();
     return resultado;
 }
 int generaArchivo()
@@ -334,14 +337,16 @@ void leeArchivo(ifstream &rd,bool &t)
          hilera = "INDICE\t\tCEDULA\t\t\t\tNOMBRE\n";
 
          cout<<hilera<<endl;
+         cont =1;
 
          while(rd>>j->cedula>>j->nombre>>j->totalPuntos)
 
          {
 
-             cont++;
+
 
                imprimeLineas(cont,j->cedula,j->nombre);
+               cont++;
          }
 
     }else
@@ -358,11 +363,8 @@ void leeArchivo(ifstream &rd,bool &t)
 
         }
 
-
         delete j;
         rd.close();
-
-
 }
 
 void imprimeLineas(string &cedula,string &nombre, int &ptos)
@@ -418,9 +420,11 @@ void RealizaRondas(vector<string>&lst,vector<Jugador>&lt)
     {
         if(lst[i]==lt[i].cedula)
         {
+             srand(time(NULL));
+
             while(cont!=5)
             {
-                 srand(time(0));
+
                 lt[i].totalPuntos+= Puntaje();
                   cont++;
             }
@@ -497,14 +501,15 @@ int Puntaje(){
     int resultado=0;
     int num;
     const int PTOSDARDOS[6] = {1,2,3,4,5,10};
+      //srand(time(0));
+      //while(resultado==0){
 
-      while(resultado==0){
 
-        srand(time(0));
         num = rand()%6;
+
         resultado=PTOSDARDOS[num];
 
-      }
+    //  }
 return resultado;
 
 }
