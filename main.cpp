@@ -34,14 +34,6 @@ struct Jugador
 
 };
 
-//struct Perdedor{
-//    int ronda;
-//    int codJugador;
-//    string nombre;
-//    int puntos;
-//
-//};
-
 struct Ronda
 {
     string codJugador;
@@ -76,6 +68,7 @@ int cont =0;
 
 
 
+
     //Tabla de tragos
    Tragos tabla[6]={{1,"Martin en las Rocas",3500},
                     {2,"Maria Sangrienta",2500},
@@ -97,6 +90,7 @@ void imprimeLineas(int &,string &,string &);
 void OrdenaVector(vector<Jugador> &);
 void leeArchivo(ifstream &,bool &);
 void modificArchivo(vector<Jugador>&);
+bool ComparaString(string );
 
 int CopiaArchivo_Vector(vector <Jugador>&);
 
@@ -106,13 +100,11 @@ int main()
     try{
         int op =0;
         char opc;
+        Jugador jug;
 
 
 
         generaArchivo();
-
-
-
             do{
                 cout<< menu()<<endl;
                     cin>>op;
@@ -122,8 +114,6 @@ int main()
                         case 1:
                             {
                                 char continua;
-
-
                                     do
                                     {
                                         string cedula= "";
@@ -136,7 +126,6 @@ int main()
                                         RegistraJugador(cedula,nombre);
                                             cout<<"Desea agregar otro usuario : S/N?"<<endl;
                                                 cin>>continua;
-
                                     }while(toupper(continua)=='S');
 
                             }
@@ -165,15 +154,16 @@ int main()
                                     {
                                         cout<<"Digite el numero de Cedula del Jugador"<<endl;
                                         cin>>ced;
-                                        for(unsigned int i =0;i<listaTemporal.size();i++)
-                                        {
-                                            if(listaTemporal[i].cedula==ced)
-                                            {
-                                                existe = true;
-                                            }
-                                        }
-                                        //  cout<<"Revise la cedula que digito, porque no es un usuario registrado"<<endl;
+//                                            for(unsigned int i =0;i<listaTemporal.size();i++)
+//                                            {
+//                                                if(listaTemporal[i].cedula.compare(ced)==1)
+//                                                {
+//                                                    existe = true;
+//                                                }
+//                                            }
+                                            existe = ComparaString(ced);
 
+                                        //  cout<<"Revise la cedula que digito, porque no es un usuario registrado"<<endl;
                                         jugadores.push_back(ced);
 
                                         if(jugadores.size()>1)
@@ -185,11 +175,8 @@ int main()
                                                  sigue = (toupper(c)=='N')?false:true;
 
                                             }
-
                                         }
-
                                     }
-
                             }
 
                         break;
@@ -203,8 +190,6 @@ int main()
                                 cout<<"\n"<<endl;
 
                             }
-
-
 
                         break;
                         case 4:
@@ -244,8 +229,21 @@ int main()
 
     }
 
+bool ComparaString(string c)
+{
+    bool resultado = false;
+    int j;
+    for(unsigned int i=0; i< listaTemporal.size();i++)
+    {
+        j = listaTemporal[i].cedula.compare(c);
 
+        }
 
+        resultado = (j==0)?true:false;
+
+    return resultado;
+
+}
 
 
 int menu()
@@ -335,15 +333,12 @@ void leeArchivo(ifstream &rd,bool &t)
     {
          hilera = "INDICE\t\tCEDULA\t\t\t\tNOMBRE\n";
 
-
          cout<<hilera<<endl;
 
-
          while(rd>>j->cedula>>j->nombre>>j->totalPuntos)
+
          {
 
-
-           //  temporal.push_back(j->cedula);
              cont++;
 
                imprimeLineas(cont,j->cedula,j->nombre);
@@ -423,8 +418,9 @@ void RealizaRondas(vector<string>&lst,vector<Jugador>&lt)
     {
         if(lst[i]==lt[i].cedula)
         {
-            while(cont!=50)
+            while(cont!=5)
             {
+                 srand(time(0));
                 lt[i].totalPuntos+= Puntaje();
                   cont++;
             }
@@ -437,6 +433,7 @@ void RealizaRondas(vector<string>&lst,vector<Jugador>&lt)
 void modificArchivo(vector<Jugador>&lt)
 //con los nuevos puntajes en el vector temporal, se piensa modificar los puntos
 {
+    remove(archive);
       escribe.open(archive,ios::app);
 
 
@@ -450,7 +447,7 @@ void modificArchivo(vector<Jugador>&lt)
 
     }  else
         {
-            cerr<<"Error no se pudo abrir el archivo Linea 473"<<endl;
+            cerr<<"Error no se pudo abrir el archivo Linea 431"<<endl;
         }
 
 
@@ -464,10 +461,10 @@ void OrdenaVector(vector<Jugador> &lt)
     string nomb;
     string ced;
     int ptos;
-     for(unsigned int l=0; l<lt.size();l++)
+     for( unsigned int l=0; l<lt.size();l++)
         //este for ordena el vector de mayor a menor
     {
-         Jugador *j;
+
 
                 if(lt[l+1].totalPuntos > lt[l].totalPuntos)
                 {
@@ -475,7 +472,7 @@ void OrdenaVector(vector<Jugador> &lt)
                     ced = lt[l+1].cedula;
                     nomb = lt[l+1].nombre;
                     ptos = lt[l+1].totalPuntos;
-                        j = new Jugador(ced,nomb,ptos);
+                    Jugador *j = new Jugador(ced,nomb,ptos);
 
 
 
@@ -483,11 +480,12 @@ void OrdenaVector(vector<Jugador> &lt)
                     lt[l+1].nombre = lt[l].nombre;
                     lt[l+1].totalPuntos = lt[l].totalPuntos;
 
-
-                    lt[l]= *j;
-
+                    lt[l].cedula = j->cedula;
+                    lt[l].nombre = j->nombre;
+                    lt[l].totalPuntos = j->totalPuntos;
+                    delete j;
                 }
-        delete j;
+
     }
 
 
