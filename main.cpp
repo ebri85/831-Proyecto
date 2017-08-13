@@ -61,6 +61,7 @@ struct Tragos
 
 const int tamRonda = 10;
 bool estatus;
+const char *archive = "Tabla_Resultados.txt";
 fstream archivo;
 ofstream escribe;
 ifstream lee;
@@ -88,7 +89,6 @@ int cont =0;
 
 void RegistraJugador(string &ced, string &nomb);
 int generaArchivo();
-void RegistraPartida(Ronda [][tamRonda],int,int,Jugador []);
 void RealizaRondas(vector<string> &,vector<Jugador> &);
 int Puntaje();
 int menu();
@@ -97,6 +97,8 @@ void imprimeLineas(int &,string &,string &);
 void OrdenaVector(vector<Jugador> &);
 void leeArchivo(ifstream &,bool &);
 void modificArchivo(vector<Jugador>&);
+
+int CopiaArchivo_Vector(vector <Jugador> &lt);
 
 int main()
 {
@@ -147,57 +149,15 @@ int main()
                                 estatus = true;
                                 bool existe = true;
                                 bool sigue= true;
-                                char c;
+
 
                                 string ced;
                                 cout<<"Lista de Jugadores Registrados"<<endl;
                                 leeArchivo(lee,estatus);
                                 jugadores.reserve(8);
-
-
-                                while((existe)&&(sigue))
-                                    //valida el numero de cedula que exista en el vector temporal
-                                    //luego lo agrega a un vector de jugadores, esto va a facilitar la busqueda en el archivo
-                                    //y poder generar los puntos de la ronda de cada uno
-                                    {
-                                        cout<<"Digite el numero de Cedula del Jugador"<<endl;
-                                        cin>>ced;
-                                        for(unsigned int i =0;i<temporal.size();i++)
-                                        {
-                                            if(temporal[i]==ced)
-                                            {
-                                                existe = true;
-                                               //  cout<<"Revise la cedula que digito, porque no es un usuario registrado"<<endl;
-
-                                            }
-
-                                        }
-
-                                        jugadores.push_back(ced);
-
-                                        if(jugadores.size()>1)
-                                        {   sigue = true;
-                                            if(jugadores.size()<9)
-                                            {
-                                                cout<<"Desea agregar otro Jugador?: S/N"<<endl;
-                                                cin>>c;
-                                                 sigue = (toupper(c)=='N')?false:true;
-
-                                            }
-
-                                        }
-
-                                    }
-                                    RealizaRondas(jugadores,listaTemporal);
-
-                                    OrdenaVector(listaTemporal);
-                                    modificArchivo(listaTemporal);
-
-
-
+                                CopiaArchivo_Vector(listaTemporal);
 
                             }
-
 
                         break;
 
@@ -227,7 +187,16 @@ int main()
 
                         break;
 
-                        case 0:
+                        case 5:
+                            {
+
+                                for(unsigned int i=0; i < listaTemporal.size();i++)
+                                {
+
+                                    cout<< listaTemporal[i].cedula<<" \t\t\t "<< listaTemporal[i].nombre <<"\t\t\t" <<listaTemporal[i].totalPuntos<<endl;
+                                }
+
+                            }
 
                             return 0;
 
@@ -274,7 +243,34 @@ int menu()
 return resultado;
 //Fin de Metodo Menu
 }
+int CopiaArchivo_Vector(vector <Jugador> &lt)
+///copia el archivo a un vector temporal para luego generar las rondas y modificar el archivo.
+{
+    lt.clear();
+    int resultado=1;
+    string nomb,ced;
+    int ptos;
+    lee.open(archive);
+        if(!archive)
+        {
+            cerr<<"Error al abrir el archivo LINEA 241"<<endl;
+            exit(1);
+        }
 
+        while(lee>> ced >> nomb >> ptos)
+        {   Jugador *j;
+            j = new Jugador(ced,nomb,ptos);
+            lt.push_back(*j);
+            delete j;
+            resultado++;
+
+        }
+
+
+
+    return resultado;
+
+}
 int generaArchivo()
 ///revisa si el archivo existe abriendolo, si existe lo cierra, si no existe crea el mismo y lo cierra
 {
@@ -289,7 +285,7 @@ int generaArchivo()
             {
                 //crea el archivo retorna 0
 
-                  archivo.open("TablaResultados.txt");
+                  archivo.open(archive);
                   archivo.close();
                 return 0;
 
@@ -306,12 +302,12 @@ void leeArchivo(ifstream &rd,bool &t)
 
     Jugador *j = new Jugador();
 
-    rd.open("TablaResultados.txt");
+    rd.open(archive);
     if(!rd)
     {
-        cerr<<"Error para abrir el Archivo LINEA312";
+        cerr<<"Error para abrir el Archivo LINEA 312";
 
-
+        exit(1);
     }
 
     if(t==true)
@@ -372,7 +368,7 @@ void RegistraJugador(string &ced, string &nomb)
 {
     try{
 
-        ofstream escribe("TablaResultados",ios::app);
+        ofstream escribe(archive,ios::app);
         int ptos=0;
 
             if(escribe.is_open())
@@ -399,66 +395,13 @@ void RegistraJugador(string &ced, string &nomb)
 void RealizaRondas(vector<string> &lst,vector<Jugador> &lt)
 {
 
-    string nomb,ced,pt;
 
-
-    int ptos=0;
-
-    int k=0;
-    while(k<=10)
-    //este for se ejecuta 10 veces simulando las rondas y escribiendo nuevamente el archivo
-    {
-    archivo.open("TablaResultados.txt");
-
-    if(archivo)
-    {
-        cerr<<"No se pudo abrir el archivo Linea 415"<<endl;
-    }
-
-    Jugador *j;
-
-
-
-            while(!archivo.eof()){
-        //escribe en un vector temporal de Tipo Jugador todo el contenido del archivo
-                archivo >> ced >> nomb >>ptos;
-                j= new Jugador(ced,nomb,ptos);
-
-                listaTemporal.push_back(*j);
-
-                delete j;
-
-            }
-
-            for(unsigned int i=0; i<listaTemporal.size();i++)
-                //Compara el vector temporal con el Vector de lista de las cedulas que se introdujeron y se modifica el puntaje ejecutantolo los 5 turnos
-                // esto equivale a 1 ronda
-            {
-                if(listaTemporal[i].cedula==lst[i])
-                {
-                    for(int j =0; j<5; j++)
-                    {
-                        ptos+=Puntaje();
-
-                    }
-                    listaTemporal[i].totalPuntos=ptos;
-
-                }
-                ptos =0;
-
-        }
-
-        k++;
-    archivo.close();
-    }
-
-    // remove("Tabla_Resultados.txt");
 
 }
 
 void modificArchivo(vector<Jugador>&lt)
 {
-      escribe.open("TablaResultados.txt", ios::app);
+      escribe.open(archive,ios::app);
 
     if(escribe.is_open())
     {
