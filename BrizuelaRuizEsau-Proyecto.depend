@@ -29,3 +29,14 @@
 	<strings.h>
 	<time.h>
 
+1502671848 source:/home/esau_br/Documents/GITS/831-Proyecto/main.cpp
+	<iostream>
+	<fstream>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<vector>
+	<string>
+	<strings.h>
+	<time.h>
+
